@@ -1,0 +1,18 @@
+# Frontend
+botcalm-fe-app/node_modules/
+botcalm-fe-app/dist/
+botcalm-fe-app/build/
+botcalm-fe-app/.env
+botcalm-fe-app/.env.local
+
+# Backend
+botcalm-be-app/node_modules/
+botcalm-be-app/dist/
+botcalm-be-app/build/
+botcalm-be-app/.env
+botcalm-be-app/.env.local
+
+# General
+.DS_Store
+*.iml
+*.log
