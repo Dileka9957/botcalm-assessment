@@ -1,27 +1,39 @@
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
+const bookRoutes = require("./routes/bookRoutes");
 
 // Initialize Express app
 const app = express();
+
+// Connect to MongoDB
+connectDB();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-connectDB();
-
 // Simple route for testing
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Express MongoDB application." });
+  res.json({ message: "Welcome to Book Management API" });
+});
+
+// API Routes
+app.use("/api/books", bookRoutes);
+
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send("Something broke!");
+  res.status(500).json({
+    message: "Internal Server Error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
 });
 
 module.exports = app;
