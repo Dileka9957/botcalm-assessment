@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const bookRoutes = require("./routes/bookRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // Initialize Express app
 const app = express();
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 
 // 404 Handler
