@@ -41,6 +41,7 @@ const useAuthStore = create<AuthState>((set) => {
         //   title: 'Login successful',
         //   description: 'Welcome back!',
         // });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         const errorMessage = err.response?.data?.error || 'Login failed';
         set({ error: errorMessage, loading: false });
@@ -64,6 +65,7 @@ const useAuthStore = create<AuthState>((set) => {
         //   description: 'Your account has been created!',
         // });
         return data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         const errorMessage = err.response?.data?.error || 'Registration failed';
         set({ error: errorMessage, loading: false });
@@ -85,6 +87,7 @@ const useAuthStore = create<AuthState>((set) => {
         // toast({
         //   title: 'Logged out successfully',
         // });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         set({ loading: false });
         // toast({
