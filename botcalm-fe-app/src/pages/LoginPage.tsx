@@ -52,7 +52,7 @@ export function LoginPage() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="email@example.com" {...field} />
+                  <Input placeholder="@example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

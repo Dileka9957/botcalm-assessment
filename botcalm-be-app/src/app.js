@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/books", bookRoutes);
+app.use("/api/v1/books", bookRoutes);
 
 // 404 Handler
 app.use((req, res) => {

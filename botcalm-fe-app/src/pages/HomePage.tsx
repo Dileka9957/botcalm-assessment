@@ -8,7 +8,15 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchBooks();
-  }, [fetchBooks]);
+  }, []);
+
+  const handleDeleteBook = async (id: string) => {
+    try {
+      await deleteBook(id);
+    } catch (error) {
+      console.error('Failed to delete book:', error);
+    }
+  };
 
   if (loading) return <div>Loading books...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
@@ -21,7 +29,10 @@ const HomePage = () => {
           Add New Book
         </Link>
       </div>
-      <BookList books={books} onDelete={deleteBook} />
+
+      {!loading && !error && (
+        <BookList books={books || []} onDelete={handleDeleteBook} />
+      )}
     </div>
   );
 };

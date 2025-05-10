@@ -37,7 +37,7 @@ const useBookStore = create<BookState>()((set) => ({
     set({ loading: true, error: null });
     try {
       const { data } = await API.getBooks();
-      set({ books: data, loading: false });
+      set({ books: data?.data, loading: false });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       set({

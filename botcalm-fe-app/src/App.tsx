@@ -3,9 +3,10 @@ import useAuthStore from './stores/authStore';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AppNavbar from './components/Navbar';
 import { LoginPage } from './pages/LoginPage';
-// import PrivateRoute from './components/privateRoute';
+import PrivateRoute from './components/privateRoute';
 import { RegisterPage } from './pages/RegsiterPage';
 import HomePage from './pages/HomePage';
+import { AddBookPage } from './pages/AddBookPage';
 
 function App() {
   const loadUser = useAuthStore((state) => state.loadUser);
@@ -22,13 +23,14 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          {/* <Route
-            path="/books"
+          <Route
+            path="/books/add"
             element={
-              <PrivateRoute>
-              </PrivateRoute>
+              // <PrivateRoute>
+              <AddBookPage />
+              // </PrivateRoute>
             }
-          /> */}
+          />
         </Routes>
       </div>
     </Router>
