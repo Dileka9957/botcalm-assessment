@@ -157,11 +157,20 @@ export function RegisterPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting && (
+            <Button
+              type="submit"
+              className="w-full relative overflow-hidden bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <span className="relative z-10">Register</span>
+                  {/* Gradient background on hover */}
+                  <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
+                </>
               )}
-              Register
             </Button>
           </form>
         </Form>

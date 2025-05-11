@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./botcalm-be-app
+    env_file:
+      - ./botcalm-be-app/.env
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=${JWT_EXPIRE}
+      - JWT_COOKIE_EXPIRE=${JWT_COOKIE_EXPIRE}
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    networks:
+      - botcalm-network
+
+  frontend:
+    build: ./botcalm-fe-app
+    env_file:
+      - ./botcalm-fe-app/.env
+    environment:
+      - VITE_API_BASE_URL=http://backend:5000/api/v1
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - botcalm-network
+
+networks:
+  botcalm-network:
+    driver: bridge

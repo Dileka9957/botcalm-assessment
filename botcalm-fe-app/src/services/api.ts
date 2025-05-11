@@ -8,7 +8,7 @@ import axios, {
 
 // Create API instance
 const API: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 // Add JWT to requests
