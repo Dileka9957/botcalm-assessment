@@ -1,7 +1,7 @@
 import { GENRE_OPTIONS } from '@/types/book';
 import { z } from 'zod';
 
-export const bookFormSchema = z.object({
+export const addBookFormSchema = z.object({
   title: z
     .string()
     .min(1, {
@@ -50,4 +50,4 @@ export const bookFormSchema = z.object({
     ),
 });
 
-export type BookFormValues = z.infer<typeof bookFormSchema>;
+export type AddBookFormValues = z.infer<typeof addBookFormSchema>;

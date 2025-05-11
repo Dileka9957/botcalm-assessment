@@ -8,17 +8,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { EditBookModal } from './EditModal';
+import { useNavigate } from 'react-router-dom';
 import type { Book, BookListProps } from '@/types/book';
+import useAuthStore from '@/stores/authStore';
 
 const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
 
   const handleEditClick = (book: Book) => {
-    setSelectedBook(book);
-    setIsEditModalOpen(true);
+    // Navigate to the edit page with the book ID
+    navigate(`/books/edit/${book._id}`);
   };
 
   const handleDeleteClick = async (id: string) => {
@@ -34,37 +35,30 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
     }
   };
 
-  const handleCloseModal = () => {
-    setIsEditModalOpen(false);
-    setTimeout(() => {
-      setSelectedBook(null);
-    }, 300);
-  };
-
   return (
-    <>
-      <Table>
-        <TableHeader>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Title</TableHead>
+          <TableHead>Author</TableHead>
+          <TableHead>Genre</TableHead>
+          {user && <TableHead>Actions</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {books.length === 0 ? (
           <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Author</TableHead>
-            <TableHead>Genre</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableCell colSpan={4} className="text-center py-4">
+              No books found. Add a new book to get started.
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {books.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={4} className="text-center py-4">
-                No books found. Add a new book to get started.
-              </TableCell>
-            </TableRow>
-          ) : (
-            books.map((book) => (
-              <TableRow key={book._id}>
-                <TableCell>{book.title}</TableCell>
-                <TableCell>{book.author}</TableCell>
-                <TableCell>{book.genre}</TableCell>
+        ) : (
+          books.map((book) => (
+            <TableRow key={book._id}>
+              <TableCell>{book.title}</TableCell>
+              <TableCell>{book.author}</TableCell>
+              <TableCell>{book.genre}</TableCell>
+              {user && (
                 <TableCell className="flex gap-2">
                   <Button
                     variant="outline"
@@ -80,18 +74,12 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
                     {deletingId === book._id ? 'Deleting...' : 'Delete'}
                   </Button>
                 </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-
-      <EditBookModal
-        isOpen={isEditModalOpen}
-        onClose={handleCloseModal}
-        book={selectedBook}
-      />
-    </>
+              )}
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
   );
 };
 

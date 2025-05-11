@@ -46,7 +46,6 @@ API.interceptors.response.use(
       // Clear cookie if exists
       document.cookie =
         'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -54,7 +53,6 @@ API.interceptors.response.use(
 
 // API service with typed methods
 const ApiService = {
-  // Books
   getBooks: (): Promise<AxiosResponse<Book[]>> => API.get('/books'),
 
   getBook: (id: string): Promise<AxiosResponse<Book>> =>
@@ -69,7 +67,6 @@ const ApiService = {
   deleteBook: (id: string): Promise<AxiosResponse<void>> =>
     API.delete(`/books/${id}`),
 
-  // Auth
   login: (
     credentials: AuthCredentials
   ): Promise<AxiosResponse<{ token: string; user: User }>> =>

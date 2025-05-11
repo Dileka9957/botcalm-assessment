@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import { AddBookPage } from './pages/AddBookPage';
 import { RegisterPage } from './pages/RegsiterPage';
 import { Toaster } from 'sonner';
+import { EditBookPage } from './pages/EditBookPage';
 
 function App() {
   const loadUser = useAuthStore((state) => state.loadUser);
@@ -18,7 +19,7 @@ function App() {
   return (
     <Router>
       <Toaster richColors position="top-right" />
-      <div className="container mt-4">
+      <div className="">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -28,6 +29,14 @@ function App() {
             element={
               <PrivateRoute>
                 <AddBookPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/books/edit/:bookId"
+            element={
+              <PrivateRoute>
+                <EditBookPage />
               </PrivateRoute>
             }
           />

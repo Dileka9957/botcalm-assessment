@@ -24,6 +24,23 @@ const useBookStore = create<BookState>()((set) => ({
     }
   },
 
+  getBook: async (id: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await API.getBook(id);
+      const book = (response.data as unknown as ApiResponse<Book>).data;
+      set({ loading: false });
+      return book;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.error || 'Failed to fetch book',
+        loading: false,
+      });
+      throw err;
+    }
+  },
+
   addBook: async (book: BookInput) => {
     try {
       const response = await API.addBook(book);

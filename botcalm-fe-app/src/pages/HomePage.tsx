@@ -4,9 +4,11 @@ import BookList from '@/components/BookList';
 import useBookStore from '@/stores/bookStore';
 import type { Book } from '@/types/book';
 import AppNavbar from '@/components/Navbar';
+import useAuthStore from '@/stores/authStore';
 
 const HomePage = () => {
   const { books, loading, error, fetchBooks, deleteBook } = useBookStore();
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     fetchBooks();
@@ -27,16 +29,22 @@ const HomePage = () => {
   return (
     <div>
       <AppNavbar />
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Books</h1>
-        <Link to="/books/add" className="btn btn-primary">
-          Add New Book
-        </Link>
-      </div>
+      <div className="mt-10">
+        {user && (
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <Link to="/books/add" className="btn btn-primary">
+              Add New Book
+            </Link>
+          </div>
+        )}
 
-      {!loading && !error && (
-        <BookList books={(books as Book[]) || []} onDelete={handleDeleteBook} />
-      )}
+        {!loading && !error && (
+          <BookList
+            books={(books as Book[]) || []}
+            onDelete={handleDeleteBook}
+          />
+        )}
+      </div>
     </div>
   );
 };

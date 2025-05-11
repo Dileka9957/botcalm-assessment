@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -28,10 +28,14 @@ import {
   type AddBookFormValues,
 } from '@/schemas/bookSchema';
 import { toast } from 'sonner';
+import { useParams, useNavigate } from 'react-router-dom';
 
-export function AddBookPage() {
+export function EditBookPage() {
   const [error, setError] = useState<string | null>(null);
-  const { loading } = useBookStore();
+  const [loading, setLoading] = useState(false);
+  const { bookId } = useParams();
+  const navigate = useNavigate();
+  const { getBook, updateBook } = useBookStore();
 
   const form = useForm<AddBookFormValues>({
     resolver: zodResolver(addBookFormSchema),
@@ -45,10 +49,42 @@ export function AddBookPage() {
     },
   });
 
-  const { addBook } = useBookStore();
+  useEffect(() => {
+    const fetchBook = async () => {
+      if (!bookId) return;
+
+      try {
+        setLoading(true);
+        const book = await getBook(bookId);
+        if (book) {
+          form.reset({
+            title: book.title,
+            author: book.author,
+            genre: book.genre,
+            publicationDate: book.publicationDate
+              ? format(new Date(book.publicationDate), 'yyyy-MM-dd')
+              : format(new Date(), 'yyyy-MM-dd'),
+            description: book.description,
+            isbn: book.isbn,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch book:', err);
+        toast.error('Failed to load book data');
+        navigate('/books');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [bookId, getBook, form, navigate]);
 
   const onSubmit = async (values: AddBookFormValues) => {
+    if (!bookId) return;
+
     setError(null);
+    setLoading(true);
 
     try {
       const formattedData = {
@@ -56,14 +92,12 @@ export function AddBookPage() {
         publicationDate: new Date(values.publicationDate).toISOString(),
       };
 
-      await addBook(formattedData);
-      toast.success('Book created successfully!', {
-        description: 'Book created successfully!',
-      });
-      form.reset();
+      await updateBook(bookId, formattedData);
+      toast.success('Book updated successfully!');
+      navigate('/');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      // Handle various error formats that might come from the store or API
+      // Handle various error formats
       if (Array.isArray(err.response?.data?.error)) {
         setError(err.response.data.error.join(', '));
       } else if (typeof err.response?.data?.error === 'string') {
@@ -71,16 +105,19 @@ export function AddBookPage() {
       } else if (err.message) {
         setError(err.message);
       } else {
-        setError('Failed to create book');
+        setError('Failed to update book');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
       <AppNavbar />
-      <h2 className="my-4">Add New Book</h2>
       <div className="container mt-5" style={{ maxWidth: '600px' }}>
+        <h2 className="my-4">Edit Book</h2>
+
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
@@ -126,6 +163,7 @@ export function AddBookPage() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -204,9 +242,20 @@ export function AddBookPage() {
               )}
             />
 
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Creating...' : 'Add Book'}
-            </Button>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={loading} className="flex-1">
+                {loading ? 'Updating...' : 'Update Book'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/')}
+                disabled={loading}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            </div>
           </form>
         </Form>
       </div>

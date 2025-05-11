@@ -8,17 +8,10 @@ const {
   deleteBook,
 } = require("../controllers/bookController");
 
-const { protect, authorize } = require("../utils/auth");
+const { protect } = require("../utils/auth");
 
-router
-  .route("/")
-  .get(getBooks)
-  .post(protect, authorize("publisher", "admin"), createBook);
+router.route("/").get(getBooks).post(createBook);
 
-router
-  .route("/:id")
-  .get(getBook)
-  .put(protect, authorize("publisher", "admin"), updateBook)
-  .delete(protect, authorize("admin"), deleteBook);
+router.route("/:id").get(getBook).put(updateBook).delete(deleteBook);
 
 module.exports = router;

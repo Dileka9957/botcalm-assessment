@@ -37,6 +37,7 @@ export interface BookState {
   addBook: (book: BookInput) => Promise<Book>;
   updateBook: (id: string, book: BookInput) => Promise<Book>;
   deleteBook: (id: string) => Promise<void>;
+  getBook: (id: string) => Promise<Book>;
 }
 
 export interface BookListProps {

@@ -27,7 +27,7 @@ const AppNavbar = () => {
 
   return (
     <div className="border-b bg-slate-950 text-white">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="flex h-16 items-center justify-between px-4">
         {/* Brand */}
         <div className="flex items-center">
           <Link to="/" className="text-xl font-bold">
@@ -36,7 +36,7 @@ const AppNavbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-4">
+        <div className="hidden lg:flex items-center space-x-16">
           <NavigationMenu>
             <NavigationMenuList className="hidden lg:flex">
               {user && (
@@ -44,17 +44,17 @@ const AppNavbar = () => {
                   <NavigationMenuItem>
                     <Link
                       to="/"
-                      className="text-sm font-medium px-4 py-2 hover:text-slate-300 transition-colors"
+                      className="text-sm font-medium px-8 py-2 hover:text-slate-300 transition-colors"
                     >
-                      Books
+                      All books
                     </Link>
                   </NavigationMenuItem>
                   <NavigationMenuItem>
                     <Link
                       to="/books/add"
-                      className="text-sm font-medium px-4 py-2 hover:text-slate-300 transition-colors"
+                      className="text-sm font-medium px-8 py-2 hover:text-slate-300 transition-colors"
                     >
-                      Add Book
+                      Add a new book
                     </Link>
                   </NavigationMenuItem>
                 </>
@@ -62,7 +62,7 @@ const AppNavbar = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
             {user ? (
               <Button
                 variant="outline"
@@ -111,7 +111,7 @@ const AppNavbar = () => {
                         to="/"
                         className="px-4 py-2 hover:bg-slate-800 rounded-md"
                       >
-                        Books
+                        All books
                       </Link>
                     </SheetClose>
                     <SheetClose asChild>
@@ -119,7 +119,7 @@ const AppNavbar = () => {
                         to="/books/add"
                         className="px-4 py-2 hover:bg-slate-800 rounded-md"
                       >
-                        Add Book
+                        Add a new book
                       </Link>
                     </SheetClose>
                   </>
