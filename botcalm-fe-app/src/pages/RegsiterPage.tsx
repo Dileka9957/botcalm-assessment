@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import useAuthStore from '../stores/authStore';
 import {
@@ -12,53 +11,70 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
-  }),
-  email: z.string().email({
-    message: 'Please enter a valid email address.',
-  }),
-  password: z.string().min(6, {
-    message: 'Password must be at least 6 characters.',
-  }),
-  role: z.enum(['user', 'admin']),
-});
+import { regsiterFormSchema, type UserFormValues } from '@/schemas/userSchema';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 export function RegisterPage() {
-  const { register, loading } = useAuthStore();
+  const { register, error, clearError } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UserFormValues>({
+    resolver: zodResolver(regsiterFormSchema),
     defaultValues: {
       name: '',
       email: '',
       password: '',
-      role: 'user', // default role
     },
+    mode: 'onTouched',
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  useEffect(() => {
+    if (error) {
+      // If there's a duplicate email error, focus the email field
+      if (error.includes('Email already')) {
+        form.setError('email', {
+          type: 'manual',
+          message: 'This email is already registered',
+        });
+        form.setFocus('email');
+      } else {
+        // Show general error as toast
+        toast.error('Registration Error', {
+          description: error,
+        });
+      }
+    }
+  }, [error, form]);
+
+  const onSubmit = async (values: UserFormValues) => {
+    clearError();
+    setIsSubmitting(true);
     try {
       await register(values);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+      toast.success('Registration successful', {
+        description: "You've been successfully registered!",
+      });
+      navigate('/login');
     } catch (err) {
-      // Error is already handled in the store
+      console.error('Registration error:', err);
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: '400px' }}>
       <h2 className="mb-4">Register</h2>
-      {/* {error && <Alert variant="danger">{error}</Alert>} */}
+      {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+
+      {/* Debug output - remove in production */}
+      <div className="mb-2 p-2 bg-gray-100 rounded text-xs">
+        <div>Form valid: {form.formState.isValid.toString()}</div>
+        <div>Errors: {JSON.stringify(form.formState.errors)}</div>
+      </div>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -68,7 +84,11 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input
+                    placeholder="John Doe"
+                    {...field}
+                    onBlur={field.onBlur}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -81,7 +101,12 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="email@example.com" {...field} />
+                  <Input
+                    placeholder="email@example.com"
+                    {...field}
+                    type="email"
+                    onBlur={field.onBlur}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -94,38 +119,20 @@ export function RegisterPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    type="password"
+                    {...field}
+                    autoComplete="new-password"
+                    onBlur={field.onBlur}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Role</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Registering...' : 'Register'}
           </Button>
         </form>
       </Form>

@@ -1,27 +1,7 @@
 import { create } from 'zustand';
 import API from '../services/api';
-import type { Book, BookInput } from '@/types/book';
+import type { ApiResponse, Book, BookInput, BookState } from '@/types/book';
 
-// Define API response types
-interface ApiResponse<T> {
-  success: boolean;
-  count?: number;
-  data: T;
-  error?: string;
-}
-
-// Define the store state and actions
-interface BookState {
-  books: Book[];
-  loading: boolean;
-  error: string | null;
-  fetchBooks: () => Promise<void>;
-  addBook: (book: BookInput) => Promise<Book>;
-  updateBook: (id: string, book: BookInput) => Promise<Book>;
-  deleteBook: (id: string) => Promise<void>;
-}
-
-// Create the typed store
 const useBookStore = create<BookState>()((set) => ({
   books: [],
   loading: false,

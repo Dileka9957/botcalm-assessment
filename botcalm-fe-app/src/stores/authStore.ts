@@ -1,117 +1,86 @@
 import { create } from 'zustand';
 import API from '../services/api';
-// import { useToast } from '@/components/ui/use-toast';
+import type { User, AuthState, ApiResponse } from '@/types/auth';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  // Add other user properties as needed
-}
+const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  loading: false,
+  error: null,
 
-interface AuthState {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
-  register: (userData: {
-    name: string;
-    email: string;
-    password: string;
-  }) => Promise<void>;
-  logout: () => Promise<void>;
-  loadUser: () => Promise<void>;
-}
-
-const useAuthStore = create<AuthState>((set) => {
-  // const { toast } = useToast();
-
-  return {
-    user: null,
-    loading: true,
-    error: null,
-
-    login: async (credentials) => {
-      try {
-        set({ loading: true, error: null });
-        const { data } = await API.login(credentials);
-        localStorage.setItem('token', data.token);
-        set({ user: data.data, loading: false });
-        // toast({
-        //   title: 'Login successful',
-        //   description: 'Welcome back!',
-        // });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.error || 'Login failed';
-        set({ error: errorMessage, loading: false });
-        // toast({
-        //   title: 'Login failed',
-        //   description: errorMessage,
-        //   variant: 'destructive',
-        // });
-        throw err;
+  loadUser: async () => {
+    set({ loading: true, error: null });
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        set({ loading: false });
+        return;
       }
-    },
 
-    register: async (userData) => {
-      try {
-        set({ loading: true, error: null });
-        const { data } = await API.register(userData);
-        localStorage.setItem('token', data.token);
-        set({ user: data.data, loading: false });
-        // toast({
-        //   title: 'Registration successful',
-        //   description: 'Your account has been created!',
-        // });
+      const response = await API.getMe();
+      const user = (response.data as unknown as ApiResponse<User>).data;
+      set({ user, loading: false });
+    } catch (err: unknown) {
+      localStorage.removeItem('token');
+      const error = err instanceof Error ? err.message : 'Failed to load user';
+      set({ error, loading: false, user: null });
+    }
+  },
+
+  login: async (credentials) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await API.login(credentials);
+      console.log('Full login response:', response);
+
+      // Correct data structure access
+      const { token, data: user } = response.data;
+
+      if (!token || !user) {
+        throw new Error('Authentication failed - no token received');
+      }
+
+      localStorage.setItem('token', token);
+      set({ user, loading: false });
+      return user;
+    } catch (err) {
+      console.error('Login error:', err);
+      const error = err instanceof Error ? err.message : 'Login failed';
+      set({ error, loading: false });
+      throw error;
+    }
+  },
+
+  register: async (userData) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await API.register(userData);
+      const { token, data } = response.data;
+      if (token) {
+        localStorage.setItem('token', token);
+        set({ user: data, loading: false });
         return data;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.error || 'Registration failed';
-        set({ error: errorMessage, loading: false });
-        // toast({
-        //   title: 'Registration failed',
-        //   description: errorMessage,
-        //   variant: 'destructive',
-        // });
-        throw err;
       }
-    },
+      throw new Error('Registration token missing');
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : 'Registration failed';
+      set({ error, loading: false });
+      throw error; // Throw the error directly
+    }
+  },
 
-    logout: async () => {
-      try {
-        set({ loading: true });
-        await API.logout();
-        localStorage.removeItem('token');
-        set({ user: null, loading: false });
-        // toast({
-        //   title: 'Logged out successfully',
-        // });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        set({ loading: false });
-        // toast({
-        //   title: 'Logout failed',
-        //   variant: 'destructive',
-        // });
-      }
-    },
+  logout: async () => {
+    set({ loading: true });
+    try {
+      await API.logout();
+      localStorage.removeItem('token');
+      set({ user: null, loading: false });
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : 'Logout failed';
+      set({ error, loading: false });
+    }
+  },
 
-    loadUser: async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const { data } = await API.getMe();
-          set({ user: data });
-        }
-      } catch (err) {
-        localStorage.removeItem('token');
-        console.error(err);
-      } finally {
-        set({ loading: false });
-      }
-    },
-  };
-});
+  clearError: () => set({ error: null }),
+}));
 
 export default useAuthStore;

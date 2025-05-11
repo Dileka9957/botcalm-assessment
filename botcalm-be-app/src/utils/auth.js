@@ -16,6 +16,7 @@ exports.sendTokenResponse = (user, statusCode, res) => {
     ),
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
   };
 
   res
@@ -28,7 +29,6 @@ exports.sendTokenResponse = (user, statusCode, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
     });
 };

@@ -43,7 +43,7 @@ const AppNavbar = () => {
                 <>
                   <NavigationMenuItem>
                     <Link
-                      to="/books"
+                      to="/"
                       className="text-sm font-medium px-4 py-2 hover:text-slate-300 transition-colors"
                     >
                       Books
@@ -108,7 +108,7 @@ const AppNavbar = () => {
                   <>
                     <SheetClose asChild>
                       <Link
-                        to="/books"
+                        to="/"
                         className="px-4 py-2 hover:bg-slate-800 rounded-md"
                       >
                         Books

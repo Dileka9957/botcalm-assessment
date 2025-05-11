@@ -1,35 +1,10 @@
+import type { AuthCredentials, User, UserData } from '@/types/auth';
+import type { Book } from '@/types/book';
 import axios, {
   type AxiosInstance,
   type AxiosResponse,
   AxiosError,
 } from 'axios';
-
-// Define interfaces for our data models
-interface Book {
-  _id?: string;
-  title: string;
-  author: string;
-  // Add other book properties as needed
-}
-
-interface Credentials {
-  email: string;
-  password: string;
-}
-
-interface UserData {
-  name: string;
-  email: string;
-  password: string;
-  // Add other user properties as needed
-}
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  // Add other user properties as needed
-}
 
 // Create API instance
 const API: AxiosInstance = axios.create({
@@ -37,21 +12,41 @@ const API: AxiosInstance = axios.create({
 });
 
 // Add JWT to requests
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+API.interceptors.request.use(
+  (config) => {
+    const token =
+      localStorage.getItem('token') ||
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 // Handle 401 unauthorized responses
 API.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    // Store token if it comes in the response body
+    if (response.data?.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    return response;
+  },
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Clear cookie if exists
+      document.cookie =
+        'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -76,7 +71,7 @@ const ApiService = {
 
   // Auth
   login: (
-    credentials: Credentials
+    credentials: AuthCredentials
   ): Promise<AxiosResponse<{ token: string; user: User }>> =>
     API.post('/auth/login', credentials),
 

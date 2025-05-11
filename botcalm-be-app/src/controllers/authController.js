@@ -5,18 +5,34 @@ const { sendTokenResponse } = require("../utils/auth");
 // Register user
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: "Email already in use. Please use a different email or login.",
+      });
+    }
 
     // Create user
     const user = await User.create({
       name,
       email,
       password,
-      role,
     });
 
     sendTokenResponse(user, 200, res);
   } catch (err) {
+    // Check specifically for duplicate key error
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Email already registered. Please use a different email or login.",
+      });
+    }
     next(err);
   }
 };
@@ -26,30 +42,33 @@ exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Validate email & password
+    // Validate input
     if (!email || !password) {
-      return next(
-        new ErrorResponse("Please provide an email and password", 400)
-      );
+      console.log("Missing credentials");
+      return next(new ErrorResponse("Please provide email and password", 400));
     }
 
-    // Check for user
+    // Find user with password field included
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
+      console.log("User not found with email:", email);
       return next(new ErrorResponse("Invalid credentials", 401));
     }
 
-    // Check if password matches
+    // Check password
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
+      console.log("Password does not match for user:", email);
       return next(new ErrorResponse("Invalid credentials", 401));
     }
 
+    console.log("Successful login for:", email);
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    next(err);
+    console.error("Login error:", err);
+    next(new ErrorResponse("Cannot login, please try again", 500));
   }
 };
 

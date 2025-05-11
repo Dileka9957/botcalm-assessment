@@ -1,3 +1,10 @@
+export interface ApiResponse<T> {
+  success: boolean;
+  count?: number;
+  data: T;
+  error?: string;
+}
+
 export const GENRE_OPTIONS = [
   'Fiction',
   'Non-Fiction',
@@ -20,6 +27,16 @@ export interface Book {
   publicationDate?: string;
   description?: string;
   isbn?: string;
+}
+
+export interface BookState {
+  books: Book[];
+  loading: boolean;
+  error: string | null;
+  fetchBooks: () => Promise<void>;
+  addBook: (book: BookInput) => Promise<Book>;
+  updateBook: (id: string, book: BookInput) => Promise<Book>;
+  deleteBook: (id: string) => Promise<void>;
 }
 
 export interface BookListProps {

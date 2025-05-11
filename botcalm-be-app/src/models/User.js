@@ -23,11 +23,6 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
-  role: {
-    type: String,
-    enum: ["user", "publisher", "admin"],
-    default: "user",
-  },
   createdAt: {
     type: Date,
     default: Date.now,

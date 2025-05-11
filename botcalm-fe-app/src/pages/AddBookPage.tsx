@@ -23,6 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import useBookStore from '../stores/bookStore';
+import AppNavbar from '@/components/Navbar';
 
 // Schema for book form validation
 const formSchema = z.object({
@@ -136,143 +137,145 @@ export function AddBookPage() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '600px' }}>
-      <h2 className="mb-4">Add New Book</h2>
+    <div>
+      <AppNavbar />
+      <h2 className="my-4">Add New Book</h2>
+      <div className="container mt-5" style={{ maxWidth: '600px' }}>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+        {success && (
+          <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+            <AlertDescription>Book created successfully!</AlertDescription>
+          </Alert>
+        )}
 
-      {success && (
-        <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
-          <AlertDescription>Book created successfully!</AlertDescription>
-        </Alert>
-      )}
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Book title" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="author"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Author</FormLabel>
-                <FormControl>
-                  <Input placeholder="Author name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="genre"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Genre</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a genre" />
-                    </SelectTrigger>
+                    <Input placeholder="Book title" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Fiction">Fiction</SelectItem>
-                    <SelectItem value="Non-Fiction">Non-Fiction</SelectItem>
-                    <SelectItem value="Science Fiction">
-                      Science Fiction
-                    </SelectItem>
-                    <SelectItem value="Fantasy">Fantasy</SelectItem>
-                    <SelectItem value="Mystery">Mystery</SelectItem>
-                    <SelectItem value="Thriller">Thriller</SelectItem>
-                    <SelectItem value="Romance">Romance</SelectItem>
-                    <SelectItem value="Biography">Biography</SelectItem>
-                    <SelectItem value="History">History</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="publicationDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Publication Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    {...field}
-                    max={format(new Date(), 'yyyy-MM-dd')}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="author"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Author</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Author name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="isbn"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ISBN</FormLabel>
-                <FormControl>
-                  <Input placeholder="ISBN (10 or 13 digits)" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="genre"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Genre</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a genre" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Fiction">Fiction</SelectItem>
+                      <SelectItem value="Non-Fiction">Non-Fiction</SelectItem>
+                      <SelectItem value="Science Fiction">
+                        Science Fiction
+                      </SelectItem>
+                      <SelectItem value="Fantasy">Fantasy</SelectItem>
+                      <SelectItem value="Mystery">Mystery</SelectItem>
+                      <SelectItem value="Thriller">Thriller</SelectItem>
+                      <SelectItem value="Romance">Romance</SelectItem>
+                      <SelectItem value="Biography">Biography</SelectItem>
+                      <SelectItem value="History">History</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Book description (max 500 characters)"
-                    {...field}
-                    rows={4}
-                  />
-                </FormControl>
-                <FormMessage />
-                <div className="text-xs text-gray-500 mt-1">
-                  {field.value.length}/500 characters
-                </div>
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="publicationDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Publication Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      {...field}
+                      max={format(new Date(), 'yyyy-MM-dd')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Creating...' : 'Add Book'}
-          </Button>
-        </form>
-      </Form>
+            <FormField
+              control={form.control}
+              name="isbn"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ISBN</FormLabel>
+                  <FormControl>
+                    <Input placeholder="ISBN (10 or 13 digits)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Book description (max 500 characters)"
+                      {...field}
+                      rows={4}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <div className="text-xs text-gray-500 mt-1">
+                    {field.value.length}/500 characters
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? 'Creating...' : 'Add Book'}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

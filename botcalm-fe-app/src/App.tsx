@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import useAuthStore from './stores/authStore';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AppNavbar from './components/Navbar';
 import { LoginPage } from './pages/LoginPage';
 import PrivateRoute from './components/privateRoute';
-import { RegisterPage } from './pages/RegsiterPage';
 import HomePage from './pages/HomePage';
 import { AddBookPage } from './pages/AddBookPage';
+import { RegisterPage } from './pages/RegsiterPage';
+import { Toaster } from 'sonner';
 
 function App() {
   const loadUser = useAuthStore((state) => state.loadUser);
@@ -17,7 +17,7 @@ function App() {
 
   return (
     <Router>
-      <AppNavbar />
+      <Toaster richColors position="top-right" />
       <div className="container mt-4">
         <Routes>
           <Route path="/" element={<HomePage />} />

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import BookList from '@/components/BookList';
 import useBookStore from '@/stores/bookStore';
 import type { Book } from '@/types/book';
+import AppNavbar from '@/components/Navbar';
 
 const HomePage = () => {
   const { books, loading, error, fetchBooks, deleteBook } = useBookStore();
@@ -25,6 +26,7 @@ const HomePage = () => {
 
   return (
     <div>
+      <AppNavbar />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Books</h1>
         <Link to="/books/add" className="btn btn-primary">

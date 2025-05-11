@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 
 import useAuthStore from '../stores/authStore';
@@ -13,29 +12,33 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
+import { loginFormSchema, type loginFormValues } from '@/schemas/userSchema';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export function LoginPage() {
-  const { login, loading } = useAuthStore();
+  const { login, loading, error, clearError } = useAuthStore();
+  const navigate = useNavigate();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<loginFormValues>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: loginFormValues) => {
+    clearError();
     try {
       await login(values);
+      toast.success('Login successful');
+      navigate('/'); // Redirect after successful login
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      // Error is already handled in the store
+      toast.error('Login failed', {
+        description: error,
+      });
     }
   };
 
