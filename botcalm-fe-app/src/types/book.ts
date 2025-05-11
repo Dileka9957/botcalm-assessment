@@ -24,7 +24,7 @@ export interface Book {
   title: string;
   author: string;
   genre: Genre;
-  publicationDate?: string;
+  publicationDate: string;
   description?: string;
   isbn?: string;
 }

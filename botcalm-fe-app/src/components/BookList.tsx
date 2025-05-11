@@ -13,8 +13,10 @@ import type { Book, BookListProps } from '@/types/book';
 import useAuthStore from '@/stores/authStore';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Book as BookIcon } from 'lucide-react';
+import { formatDate } from '@/utils/dateFormatter';
 
 const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
+  console.log('books', books);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
@@ -73,6 +75,7 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
             <TableHead className="font-semibold">Title</TableHead>
             <TableHead className="font-semibold">Author</TableHead>
             <TableHead className="font-semibold">Genre</TableHead>
+            <TableHead className="font-semibold">publication date</TableHead>
             {user && (
               <TableHead className="text-right font-semibold">
                 Actions
@@ -94,6 +97,9 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
                 >
                   {book.genre}
                 </span>
+              </TableCell>
+              <TableCell className="text-gray-500 text-sm">
+                {formatDate(book.publicationDate)}
               </TableCell>
               {user && (
                 <TableCell className="flex justify-end gap-2">

@@ -8,6 +8,7 @@ import useAuthStore from '@/stores/authStore';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
 import useDebounce from '@/hooks/useDebounce';
+import MobileBookList from '@/components/MobileBookList';
 
 const HomePage = () => {
   const { books, loading, error, fetchBooks, deleteBook } = useBookStore();
@@ -112,7 +113,18 @@ const HomePage = () => {
 
           {!loading && !error && (
             <div className="bg-white rounded-md shadow-sm border border-gray-200">
-              <BookList books={filteredBooks} onDelete={handleDeleteBook} />
+              {/* Desktop Table View (hidden on mobile) */}
+              <div className="hidden md:block">
+                <BookList books={filteredBooks} onDelete={handleDeleteBook} />
+              </div>
+
+              {/* Mobile Card View (hidden on desktop) */}
+              <div className="md:hidden">
+                <MobileBookList
+                  books={filteredBooks}
+                  onDelete={handleDeleteBook}
+                />
+              </div>
             </div>
           )}
 
