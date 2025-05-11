@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import useBookStore from '../stores/bookStore';
 import AppNavbar from '@/components/Navbar';
@@ -29,9 +28,10 @@ import {
 } from '@/schemas/bookSchema';
 import { toast } from 'sonner';
 import { useParams, useNavigate } from 'react-router-dom';
+import { BookOpen, Loader2 } from 'lucide-react';
 
 export function EditBookPage() {
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { bookId } = useParams();
   const navigate = useNavigate();
@@ -93,7 +93,9 @@ export function EditBookPage() {
       };
 
       await updateBook(bookId, formattedData);
-      toast.success('Book updated successfully!');
+      toast.success('Book updated successfully!', {
+        description: `"${values.title}" has been updated in your collection.`,
+      });
       navigate('/');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -112,152 +114,205 @@ export function EditBookPage() {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/');
+  };
+
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <AppNavbar />
-      <div className="container mt-5" style={{ maxWidth: '600px' }}>
-        <h2 className="my-4">Edit Book</h2>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white shadow-sm rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <BookOpen className="h-6 w-6 text-blue-600" />
+            <h1 className="text-2xl font-bold text-gray-900">Edit Book</h1>
+          </div>
 
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Book title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Author</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Author name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="genre"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Genre</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a genre" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Fiction">Fiction</SelectItem>
-                      <SelectItem value="Non-Fiction">Non-Fiction</SelectItem>
-                      <SelectItem value="Science Fiction">
-                        Science Fiction
-                      </SelectItem>
-                      <SelectItem value="Fantasy">Fantasy</SelectItem>
-                      <SelectItem value="Mystery">Mystery</SelectItem>
-                      <SelectItem value="Thriller">Thriller</SelectItem>
-                      <SelectItem value="Romance">Romance</SelectItem>
-                      <SelectItem value="Biography">Biography</SelectItem>
-                      <SelectItem value="History">History</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="publicationDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Publication Date</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      max={format(new Date(), 'yyyy-MM-dd')}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="isbn"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>ISBN</FormLabel>
-                  <FormControl>
-                    <Input placeholder="ISBN (10 or 13 digits)" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Book description (max 500 characters)"
-                      {...field}
-                      rows={4}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                  <div className="text-xs text-gray-500 mt-1">
-                    {field.value.length}/500 characters
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <div className="flex gap-2">
-              <Button type="submit" disabled={loading} className="flex-1">
-                {loading ? 'Updating...' : 'Update Book'}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate('/')}
-                disabled={loading}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
+          {loading && !form.formState.isSubmitting ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <span className="mt-4 text-gray-600">
+                Loading book information...
+              </span>
             </div>
-          </form>
-        </Form>
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-5"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">Title</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Book title"
+                            {...field}
+                            className="focus-visible:ring-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="author"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">Author</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Author name"
+                            {...field}
+                            className="focus-visible:ring-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="genre"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">Genre</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus-visible:ring-blue-500">
+                              <SelectValue placeholder="Select a genre" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Fiction">Fiction</SelectItem>
+                            <SelectItem value="Non-Fiction">
+                              Non-Fiction
+                            </SelectItem>
+                            <SelectItem value="Science Fiction">
+                              Science Fiction
+                            </SelectItem>
+                            <SelectItem value="Fantasy">Fantasy</SelectItem>
+                            <SelectItem value="Mystery">Mystery</SelectItem>
+                            <SelectItem value="Thriller">Thriller</SelectItem>
+                            <SelectItem value="Romance">Romance</SelectItem>
+                            <SelectItem value="Biography">Biography</SelectItem>
+                            <SelectItem value="History">History</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="publicationDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">
+                          Publication Date
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            max={format(new Date(), 'yyyy-MM-dd')}
+                            className="focus-visible:ring-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="isbn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">ISBN</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="ISBN (10 or 13 digits)"
+                          {...field}
+                          className="focus-visible:ring-blue-500"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">
+                        Description
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Book description (max 500 characters)"
+                          {...field}
+                          rows={4}
+                          className="resize-none focus-visible:ring-blue-500"
+                        />
+                      </FormControl>
+                      <div className="flex justify-between items-center mt-1">
+                        <FormMessage />
+                        <div
+                          className={`text-xs ${field.value.length > 450 ? (field.value.length > 500 ? 'text-red-500' : 'text-orange-500') : 'text-gray-500'}`}
+                        >
+                          {field.value.length}/500 characters
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex flex-col-reverse sm:flex-row gap-3 mt-8 pt-4 border-t border-gray-200">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="w-full sm:w-auto"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={loading || form.formState.isSubmitting}
+                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {form.formState.isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Book'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+        </div>
       </div>
     </div>
   );

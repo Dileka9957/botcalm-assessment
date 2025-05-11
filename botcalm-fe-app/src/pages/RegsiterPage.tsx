@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { regsiterFormSchema, type UserFormValues } from '@/schemas/userSchema';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import { Mail, Lock, User, Loader2 } from 'lucide-react';
 
 export function RegisterPage() {
   const { register, error, clearError } = useAuthStore();
@@ -54,88 +55,124 @@ export function RegisterPage() {
     setIsSubmitting(true);
     try {
       await register(values);
-
       toast.success('Registration successful', {
         description: "You've been successfully registered!",
       });
       navigate('/login');
     } catch (err) {
       console.error('Registration error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '400px' }}>
-      <h2 className="mb-4">Register</h2>
-      {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-md space-y-6 rounded-lg bg-white p-6 shadow-lg">
+        <div className="text-center">
+          <h2 className="mt-2 text-3xl font-bold text-gray-900">
+            Create an account
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Get started with our platform
+          </p>
+        </div>
 
-      {/* Debug output - remove in production */}
-      <div className="mb-2 p-2 bg-gray-100 rounded text-xs">
-        <div>Form valid: {form.formState.isValid.toString()}</div>
-        <div>Errors: {JSON.stringify(form.formState.errors)}</div>
-      </div>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mt-6 space-y-6"
+          >
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                          <User className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <Input
+                          placeholder="John Doe"
+                          className="pl-10"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="John Doe"
-                    {...field}
-                    onBlur={field.onBlur}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="email@example.com"
-                    {...field}
-                    type="email"
-                    onBlur={field.onBlur}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    {...field}
-                    autoComplete="new-password"
-                    onBlur={field.onBlur}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email address</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                          <Mail className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <Input
+                          placeholder="you@example.com"
+                          className="pl-10"
+                          type="email"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Registering...' : 'Register'}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                          <Lock className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="pl-10"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Register
+            </Button>
+          </form>
+        </Form>
+
+        <div className="text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <Button variant="link" className="p-0 text-blue-600" asChild>
+            <Link to="/login">Login here</Link>
           </Button>
-        </form>
-      </Form>
+        </div>
+      </div>
     </div>
   );
 }

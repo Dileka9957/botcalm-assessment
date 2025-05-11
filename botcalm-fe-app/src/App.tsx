@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import useAuthStore from './stores/authStore';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { LoginPage } from './pages/LoginPage';
 import PrivateRoute from './components/privateRoute';
 import HomePage from './pages/HomePage';
 import { AddBookPage } from './pages/AddBookPage';
 import { RegisterPage } from './pages/RegsiterPage';
 import { Toaster } from 'sonner';
 import { EditBookPage } from './pages/EditBookPage';
+import { LoginPage } from './pages/LoginPage';
 
 function App() {
   const loadUser = useAuthStore((state) => state.loadUser);
