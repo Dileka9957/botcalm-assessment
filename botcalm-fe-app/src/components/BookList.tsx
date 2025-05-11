@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import type { Book, BookListProps } from '@/types/book';
 import useAuthStore from '@/stores/authStore';
+import { toast } from 'sonner';
+import { Pencil, Trash2 } from 'lucide-react';
 
 const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -18,7 +20,6 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
   const user = useAuthStore((state) => state.user);
 
   const handleEditClick = (book: Book) => {
-    // Navigate to the edit page with the book ID
     navigate(`/books/edit/${book._id}`);
   };
 
@@ -26,9 +27,9 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
     try {
       setDeletingId(id);
       await onDelete(id);
-      console.log('Book deleted successfully');
+      toast.success('Book deleted successfully');
     } catch (error) {
-      console.log('Failed to delete book');
+      toast.error('Failed to delete book');
       console.error('Delete error:', error);
     } finally {
       setDeletingId(null);
@@ -42,7 +43,7 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
           <TableHead>Title</TableHead>
           <TableHead>Author</TableHead>
           <TableHead>Genre</TableHead>
-          {user && <TableHead>Actions</TableHead>}
+          {user && <TableHead className="text-right">Actions</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -55,23 +56,37 @@ const BookList: React.FC<BookListProps> = ({ books, onDelete }) => {
         ) : (
           books.map((book) => (
             <TableRow key={book._id}>
-              <TableCell>{book.title}</TableCell>
+              <TableCell className="font-medium">{book.title}</TableCell>
               <TableCell>{book.author}</TableCell>
-              <TableCell>{book.genre}</TableCell>
+              <TableCell className="capitalize">
+                {book.genre.toLowerCase()}
+              </TableCell>
               {user && (
-                <TableCell className="flex gap-2">
+                <TableCell className="flex justify-end gap-2">
                   <Button
                     variant="outline"
+                    size="icon"
+                    className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"
                     onClick={() => handleEditClick(book)}
                   >
-                    Edit
+                    <Pencil className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
                   </Button>
                   <Button
                     variant="outline"
+                    size="icon"
+                    className="h-8 w-8 hover:bg-red-50 hover:text-red-600"
                     onClick={() => handleDeleteClick(book._id)}
                     disabled={deletingId === book._id}
                   >
-                    {deletingId === book._id ? 'Deleting...' : 'Delete'}
+                    {deletingId === book._id ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </>
+                    )}
                   </Button>
                 </TableCell>
               )}

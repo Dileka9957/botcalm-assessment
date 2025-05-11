@@ -11,10 +11,8 @@ const useAuthStore = create<AuthState>()(
       error: null,
 
       loadUser: async () => {
-        // Check if we already have a user in store first
         const currentState = useAuthStore.getState();
         if (currentState.user) {
-          // User already loaded from persistent storage
           return;
         }
 
@@ -28,7 +26,6 @@ const useAuthStore = create<AuthState>()(
 
           const response = await API.getMe();
 
-          // Access the user data correctly from the response
           const { data } = response.data as unknown as ApiResponse<User>;
 
           if (!data) {
@@ -48,8 +45,7 @@ const useAuthStore = create<AuthState>()(
         set({ loading: true, error: null });
         try {
           const response = await API.login(credentials);
-
-          // Access token and user data correctly
+          //@ts-ignore
           const { token, data: user } = response.data;
 
           if (!token || !user) {
@@ -71,6 +67,7 @@ const useAuthStore = create<AuthState>()(
         set({ loading: true, error: null });
         try {
           const response = await API.register(userData);
+          //@ts-ignore
           const { token, data } = response.data;
           if (token) {
             localStorage.setItem('token', token);

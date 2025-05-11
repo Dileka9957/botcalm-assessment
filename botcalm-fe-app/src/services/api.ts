@@ -1,5 +1,5 @@
 import type { AuthCredentials, User, UserData } from '@/types/auth';
-import type { Book } from '@/types/book';
+import type { Book, BookInput } from '@/types/book';
 import axios, {
   type AxiosInstance,
   type AxiosResponse,
@@ -20,7 +20,6 @@ API.interceptors.request.use(
         .split('; ')
         .find((row) => row.startsWith('token='))
         ?.split('=')[1];
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -54,31 +53,25 @@ API.interceptors.response.use(
 // API service with typed methods
 const ApiService = {
   getBooks: (): Promise<AxiosResponse<Book[]>> => API.get('/books'),
-
   getBook: (id: string): Promise<AxiosResponse<Book>> =>
     API.get(`/books/${id}`),
-
-  addBook: (book: Book): Promise<AxiosResponse<Book>> =>
+  addBook: (book: BookInput): Promise<AxiosResponse<Book>> =>
     API.post('/books', book),
-
-  updateBook: (id: string, book: Book): Promise<AxiosResponse<Book>> =>
-    API.put(`/books/${id}`, book),
-
+  updateBook: (
+    id: string,
+    book: Partial<BookInput>
+  ): Promise<AxiosResponse<Book>> => API.put(`/books/${id}`, book),
   deleteBook: (id: string): Promise<AxiosResponse<void>> =>
     API.delete(`/books/${id}`),
-
   login: (
     credentials: AuthCredentials
   ): Promise<AxiosResponse<{ token: string; user: User }>> =>
     API.post('/auth/login', credentials),
-
   register: (
     userData: UserData
   ): Promise<AxiosResponse<{ token: string; user: User }>> =>
     API.post('/auth/register', userData),
-
   getMe: (): Promise<AxiosResponse<User>> => API.get('/auth/me'),
-
   logout: (): Promise<AxiosResponse<{ message: string }>> =>
     API.get('/auth/logout'),
 };

@@ -30,9 +30,7 @@ const AppNavbar = () => {
       <div className="flex h-16 items-center justify-between px-4">
         {/* Brand */}
         <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold">
-            Book Management
-          </Link>
+          <h1 className="text-xl font-bold">Book Management</h1>
         </div>
 
         {/* Desktop Navigation */}
@@ -103,7 +101,7 @@ const AppNavbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-64 bg-slate-950 text-white">
-              <nav className="flex flex-col space-y-4 mt-6">
+              <nav className="flex flex-col space-y-4 mt-8">
                 {user && (
                   <>
                     <SheetClose asChild>
@@ -128,7 +126,7 @@ const AppNavbar = () => {
                   <Button
                     variant="outline"
                     onClick={handleLogout}
-                    className="border-white text-white hover:bg-slate-800 mt-4"
+                    className="border-white text-white hover:bg-slate-800 mt-4 mx-2"
                   >
                     Logout
                   </Button>

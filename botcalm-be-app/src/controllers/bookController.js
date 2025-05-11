@@ -142,7 +142,7 @@ exports.deleteBook = async (req, res, next) => {
       });
     }
 
-    await book.remove();
+    await book.deleteOne();
     res.status(200).json({
       success: true,
       data: {},
