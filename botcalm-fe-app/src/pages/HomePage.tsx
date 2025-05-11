@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import BookList from '@/components/BookList';
 import useBookStore from '@/stores/bookStore';
+import type { Book } from '@/types/book';
 
 const HomePage = () => {
   const { books, loading, error, fetchBooks, deleteBook } = useBookStore();
@@ -14,7 +15,8 @@ const HomePage = () => {
     try {
       await deleteBook(id);
     } catch (error) {
-      console.error('Failed to delete book:', error);
+      console.error('Delete failed:', error);
+      throw error;
     }
   };
 
@@ -31,7 +33,7 @@ const HomePage = () => {
       </div>
 
       {!loading && !error && (
-        <BookList books={books || []} onDelete={handleDeleteBook} />
+        <BookList books={(books as Book[]) || []} onDelete={handleDeleteBook} />
       )}
     </div>
   );

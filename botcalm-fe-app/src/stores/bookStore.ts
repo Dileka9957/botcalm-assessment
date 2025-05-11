@@ -1,19 +1,13 @@
 import { create } from 'zustand';
 import API from '../services/api';
+import type { Book, BookInput } from '@/types/book';
 
-// Define the Book interface
-export interface Book {
-  _id: string;
-  title: string;
-  author: string;
-  genre: string;
-}
-
-// Book without _id for creation
-export interface BookInput {
-  title: string;
-  author: string;
-  genre: string;
+// Define API response types
+interface ApiResponse<T> {
+  success: boolean;
+  count?: number;
+  data: T;
+  error?: string;
 }
 
 // Define the store state and actions
@@ -36,8 +30,11 @@ const useBookStore = create<BookState>()((set) => ({
   fetchBooks: async () => {
     set({ loading: true, error: null });
     try {
-      const { data } = await API.getBooks();
-      set({ books: data?.data, loading: false });
+      const response = await API.getBooks();
+      set({
+        books: (response.data as unknown as ApiResponse<Book[]>).data,
+        loading: false,
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       set({
@@ -49,9 +46,13 @@ const useBookStore = create<BookState>()((set) => ({
 
   addBook: async (book: BookInput) => {
     try {
-      const { data } = await API.addBook(book);
-      set((state) => ({ books: [...state.books, data] }));
-      return data;
+      const response = await API.addBook(book);
+      const newBook = (response.data as unknown as ApiResponse<Book>).data;
+      set((state) => ({
+        books: [...state.books, newBook],
+        error: null,
+      }));
+      return newBook;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       set({ error: err.response?.data?.error || 'Failed to add book' });
@@ -61,11 +62,13 @@ const useBookStore = create<BookState>()((set) => ({
 
   updateBook: async (id: string, book: BookInput) => {
     try {
-      const { data } = await API.updateBook(id, book);
+      const response = await API.updateBook(id, book);
+      const updatedBook = (response.data as unknown as ApiResponse<Book>).data;
       set((state) => ({
-        books: state.books.map((b) => (b._id === id ? data : b)),
+        books: state.books.map((b) => (b._id === id ? updatedBook : b)),
+        error: null,
       }));
-      return data;
+      return updatedBook;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       set({ error: err.response?.data?.error || 'Failed to update book' });
@@ -78,6 +81,7 @@ const useBookStore = create<BookState>()((set) => ({
       await API.deleteBook(id);
       set((state) => ({
         books: state.books.filter((book) => book._id !== id),
+        error: null,
       }));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {

@@ -26,9 +26,9 @@ function App() {
           <Route
             path="/books/add"
             element={
-              // <PrivateRoute>
-              <AddBookPage />
-              // </PrivateRoute>
+              <PrivateRoute>
+                <AddBookPage />
+              </PrivateRoute>
             }
           />
         </Routes>

@@ -89,7 +89,7 @@ const formSchema = z.object({
 
 export function AddBookPage() {
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const { loading } = useBookStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -97,7 +97,7 @@ export function AddBookPage() {
     defaultValues: {
       title: '',
       author: '',
-      genre: '',
+      genre: 'Fiction',
       publicationDate: format(new Date(), 'yyyy-MM-dd'),
       description: '',
       isbn: '',
@@ -120,6 +120,7 @@ export function AddBookPage() {
       await addBook(formattedData);
       setSuccess(true);
       form.reset();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       // Handle various error formats that might come from the store or API
       if (Array.isArray(err.response?.data?.error)) {
