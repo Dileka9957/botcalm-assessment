@@ -15,6 +15,7 @@ cd botcalm
 Create environment files by copying the examples:
 
 cp botcalm-be-app/.env.example botcalm-be-app/.env
+
 cp botcalm-fe-app/.env.example botcalm-fe-app/.env
 
 Then edit the .env files with your actual values.
