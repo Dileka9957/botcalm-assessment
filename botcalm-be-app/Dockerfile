@@ -1,12 +1,12 @@
-FROM node:20-alpine AS builder
-
+FROM node:18-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 
-# Copy .env file explicitly
-COPY .env ./
-
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app .
+COPY .env . 
 EXPOSE 5000
 CMD ["npm", "start"]
